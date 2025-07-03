@@ -1,0 +1,56 @@
+#!/bin/bash
+
+set -e
+
+
+# switch to master
+# merge all changes from meta (accepting theirs -- meaning that we keep the changes from meta)
+# "find" all .java files
+# run python meta.py file.java file.java for each of them to replace in place
+# commit with message "meta: auto-processed Java files with meta.py for push"
+# switch back to meta
+
+echo "Post-commit hook: Processing Java files with meta.py..."
+
+# Store current branch
+CURRENT_BRANCH=$(git branch --show-current)
+echo "Current branch: $CURRENT_BRANCH"
+
+# Only proceed if we're on the meta branch
+if [ "$CURRENT_BRANCH" != "meta" ]; then
+    echo "Not on meta branch, skipping post-commit processing"
+    exit 0
+fi
+
+# Switch to master branch
+echo "Switching to master branch..."
+git checkout master
+
+# Overwrite current files with meta branch
+echo "Overwriting current files with meta branch..."
+git checkout meta -- .
+
+# Find all .java files and process them with meta.py
+echo "Processing Java files with meta.py..."
+find . -name "*.java" -type f | while read -r java_file; do
+    echo "Processing: $java_file"
+    python3 meta.py "$java_file" "$java_file"
+done
+
+# Check if there are any changes to commit
+if git diff --quiet; then
+    echo "No changes to commit after processing"
+else
+    # Commit with message "meta: auto-processed Java files with meta.py for push"
+    echo "Committing processed Java files..."
+    git add -A
+    git commit -m "meta: auto-processed Java files with meta.py for push"
+fi
+
+# Switch back to meta branch
+echo "Switching back to meta branch..."
+git checkout meta
+
+echo "Post-commit hook completed successfully!"
+
+
