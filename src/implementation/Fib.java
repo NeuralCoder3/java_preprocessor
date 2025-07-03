@@ -9,6 +9,7 @@ public class Fib {
         if (n <= 1) {
             return n;
         }
+        // Pre-processed Fibonacci code
         if(n == 0) return (int) 0L;
         if(n == 1) return (int) 1L;
         if(n == 2) return (int) 1L;
