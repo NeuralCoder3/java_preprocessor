@@ -15,6 +15,7 @@ public class Fib {
             for _ in range(n):
                 a, b = b, a + b
             return a
+        print(f"{space}// Pre-processed Fibonacci code")
         for i in range(80):
             print(f"{space}if(n == {i}) return (int) {fib(i)}L;")
         %>
